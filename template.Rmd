@@ -14,3 +14,23 @@ library(tidyverse)
 ```
 
 This document will show you how to import data
+
+# Import the FAS Litters CSV
+
+```{r}
+litters_df <- read_csv("data_import_examples/data_import_examples/FAS_litters.csv")
+litters_df = janitor::clean_names(litters_df)
+```
+
+
+```{r}
+head(litters_df) # first six entries 
+tail(litters_df, 10) # last 10 entries
+
+```
+```{r eval = FALSE}
+view(litters_df)
+
+
+```
+
