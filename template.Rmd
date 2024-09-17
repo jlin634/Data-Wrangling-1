@@ -1,0 +1,16 @@
+---
+title: "Data Import"
+output: github_document
+---
+
+
+# Section 1
+
+Here's a **code chunk** that samples from 
+a _normal distribution_:
+
+```{r setup, echo = FALSE, message = FALSE}
+library(tidyverse)
+```
+
+This document will show you how to import data
