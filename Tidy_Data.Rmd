@@ -1,0 +1,109 @@
+---
+title: ""
+author: "Jeffrey Lin"
+date: "2024-09-17"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(tidyverse)
+library(readr)
+```
+
+
+This document will show how to tidy data
+
+
+```{r}
+pulse_df = 
+ haven::read_sas("data_import_examples/data_import_examples/public_pulse_data.sas7bdat") %>%
+  janitor::clean_names()
+
+head(pulse_df)
+```
+
+## Pivot Longer
+
+converts depression inventories into a single column long form
+
+```{r}
+pulse_tidy_df = pulse_df %>%
+  pivot_longer(
+    cols = bdi_score_bl:bdi_score_12m,
+    names_to = "visit",
+    values_to = "bdi_score",
+    names_prefix = "bdi_score_"
+  ) %>%
+  mutate(
+    visit = replace(visit, visit == "bl", "00m")
+  ) %>%
+  relocate(id, visit)
+
+head(pulse_tidy_df)
+
+
+```
+
+```{r}
+litters_df = 
+  read_csv("data_import_examples/data_import_examples/FAS_litters.csv",
+           na = c("NA", ".", "")) %>%
+           janitor::clean_names()
+
+head(litters_df)
+```
+
+Using Case Match
+```{r}
+tidy_litters_df <- litters_df %>%
+  pivot_longer(
+    cols = gd0_weight:gd18_weight,
+    names_to = "gd_time",
+    values_to = "weight"
+  ) %>%
+  mutate(
+    gd_time = case_match(
+      gd_time,
+      "gd0_weight" ~ 0, 
+      "gd18_weight" ~ 18
+    ))
+
+head(tidy_litters_df)
+
+```
+
+## Pivot Wider
+
+Let's make up an analysis result table 
+
+```{r}
+analysis_df <- tibble(
+   group = c("treatment", "treatment", "placebo", "placebo"),
+    time = c("pre", "post", "pre", "post"),
+    mean = c(4, 8, 3.5, 4)
+)
+
+analysis_df
+
+```
+
+Pivot Wider for Readability (helpful for post-processing to make results 
+more readable)
+
+
+```{r}
+analysis_df %>%
+  pivot_wider(
+    names_from = time,
+    values_from = mean
+  ) %>%
+  knitr::kable() # how markdowns format tables
+
+analysis_df
+
+```
+

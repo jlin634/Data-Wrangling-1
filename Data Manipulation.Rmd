@@ -10,101 +10,96 @@ Here's a **code chunk** that samples from
 a _normal distribution_:
 
 ```{r setup, echo = FALSE, message = FALSE}
+library(dplyr)
 library(tidyverse)
-library(readxl)
-library(haven)
 ```
-
-This document will show you how to import data
-
-# Import the FAS Litters CSV
+# Shows how to manipulate data
 
 ```{r}
-litters_df <- read_csv("data_import_examples/data_import_examples/FAS_litters.csv")
-litters_df = janitor::clean_names(litters_df)
-```
+litters_df <- read_csv("data_import_examples/data_import_examples/FAS_litters.csv",
+                       na = c("NA", ".", ""))
 
+litters_df <- janitor::clean_names(litters_df)
 
-# skipping a row when importing
-```{r}
-litters_df <-
-  read_csv(
-    file = "data_import_examples/data_import_examples/FAS_litters.csv",
-    skip = 1
-  )
-```
-
-
-# Handling Missing Data
-```{r}
-litters_df <-
-  read_csv(
-    file = "data_import_examples/data_import_examples/FAS_litters.csv",
-    na = c(".", "NA", "")
-  )
-
-litters_df = janitor::clean_names(litters_df)
-
-pull(litters_df, gd0_weight)
+pups_df <- read_csv("data_import_examples/data_import_examples/FAS_pups.csv",
+                    na = c("NA", ".", ""))
+pups_df <- janitor::clean_names(pups_df)
 
 ```
 
-What if we code 'group' as a factor variable?
+## Select
 
 ```{r}
-litters_df <-
-  read_csv(
-    file = "data_import_examples/data_import_examples/FAS_litters.csv",
-    na = c("NA", "", "."),
-    col_types = cols(
-      Group = col_factor()
-    )
-  )
-```
+#selecting columns
 
-
-
-Using Relative Path
-
-```{r}
-pups_df <- read_csv("data_import_examples/data_import_examples/FAS_pups.csv")
-pups_df = janitor::clean_names(pups_df)
+select(litters_df, group, litter_number, gd0_weight, gd0_weight, pups_born_alive)
 
 ```
 
 
 ```{r}
-head(litters_df) # first six entries 
-tail(litters_df, 10) # last 10 entries
+#selecting range of columns
+
+select(litters_df, group:gd_of_birth)
 
 ```
-```{r eval = FALSE}
-view(litters_df)
-
-
-```
-
-# import an excel file
-
-Import MLB 2011 summary data 
 
 ```{r}
-mlb_df <- read_excel("data_import_examples/data_import_examples/mlb11.xlsx")
+# removes a column
+
+select(litters_df, -pups_survive)
 ```
 
-# import SAS Data 
-
 ```{r}
-pulse_df = read_sas("data_import_examples/data_import_examples/public_pulse_data.sas7bdat")
+# rename variable as part of the process
+select(litters_df, GROUP = group, LiTtEr_NuMber = litter_number)
+
+# or use rename function
+rename(litters_df, GROUP = group)
 
 ```
 
-
-# Never use read.csv()
-
-
-Never do this either:
 ```{r}
-litters_df$L
+# Moving Columns, this code will move the 3 specified columns to the right of
+# everything else
+select(litters_df, litter_number, pups_survive, everything())
+
+# similar function with relocate
+relocate(litters_df, litter_number, pups_survive)
+
+```
+
+```{r}
+# Learning Check
+
+select(pups_df, litter_number, sex, pd_ears)
+```
+
+
+
+
+## Filter
+
+```{r}
+filter(litters_df, gd_of_birth == 20)
+filter(litters_df, gd_of_birth == 19)
+```
+
+```{r}
+filter(litters_f, pups_born_alive != 9)
+```
+
+```{r}
+filter(litters_df, group == "Low8")
+filter(litters_df, group %in% c("Low7", "Low8"))
+
+```
+
+```{r}
+filter(litters_df, group %in% c("Low7", "Low8"), pups_born_alive == 8)
+```
+
+```{r}
+
 ```
 
